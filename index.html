@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loja Oficial | Catálogo</title>
+  <style>
+    :root {
+      --bg-main: #09090b;
+      --bg-header: #0f0f14;
+      --bg-card: #13131a;
+      --bg-input: #1a1a24;
+      --border-color: #272736;
+      --purple-primary: #8b5cf6;
+      --purple-hover: #7c3aed;
+      --purple-glow: rgba(139, 92, 246, 0.25);
+      --text-main: #f4f4f5;
+      --text-muted: #9ca3af;
+      --discount-red: #f43f5e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      padding-bottom: 40px;
+    }
+
+    /* Topo */
+    header {
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo span {
+      color: var(--purple-primary);
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      color: var(--text-main);
+      font-size: 1.1rem;
+    }
+
+    .badge-fav {
+      position: relative;
+      cursor: pointer;
+    }
+
+    /* Barra de Busca e Filtro */
+    .controls {
+      padding: 12px 12px 6px;
+      display: flex;
+      gap: 8px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .search-box {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      padding: 10px 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .filter-select {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 0 10px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    /* Grade de Produtos (2 colunas no celular) */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 10px 12px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+    }
+
+    /* Card do Produto */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--purple-primary);
+    }
+
+    .card-media {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #1e1e28;
+      overflow: hidden;
+    }
+
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .fav-btn {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(9, 9, 11, 0.7);
+      border: none;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .fav-btn.active {
+      color: var(--purple-primary);
+    }
+
+    .video-tag {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(9, 9, 11, 0.78);
+      color: #fff;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-body {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .specs {
+      list-style: none;
+      font-size: 0.73rem;
+      color: #d4d4d8;
+      line-height: 1.45;
+      margin-bottom: 6px;
+      max-height: 64px;
+      overflow: hidden;
+    }
+
+    .specs.expanded {
+      max-height: none;
+    }
+
+    .ver-mais {
+      background: none;
+      border: none;
+      color: var(--purple-primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .old-price {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    .discount {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--discount-red);
+    }
+
+    .final-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 2px 0 10px;
+    }
+
+    .final-price {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--purple-primary);
+    }
+
+    .seller {
+      font-size: 0.72rem;
+      color: var(--purple-primary);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .verified {
+      background: var(--purple-primary);
+      color: #fff;
+      border-radius: 50%;
+      width: 13px;
+      height: 13px;
+      font-size: 0.55rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .buy-btn {
+      width: 100%;
+      background: var(--purple-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px var(--purple-glow);
+      transition: background 0.2s;
+    }
+
+    .buy-btn:hover {
+      background: var(--purple-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">☰ <span id="storeTitle">SUA</span>LOJA</div>
+    <div class="header-icons">
+      <span class="badge-fav" onclick="toggleOnlyFavs()" title="Favoritos">♡ <small id="favCount">0</small></span>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar..." oninput="renderProducts()" />
+    </div>
+    <select class="filter-select" id="categoryFilter" onchange="renderProducts()">
+      <option value="todos">Filtrar</option>
+      <option value="Rara">Rara</option>
+      <option value="SemiFull">SemiFull</option>
+      <option value="Gemada">Gemada</option>
+    </select>
+  </div>
+
+  <main class="grid" id="productGrid"></main>
+
+  <script>
+    // ================= CONFIGURAÇÕES DA LOJA =================
+    const CONFIG = {
+      whatsappNumero: "5591999999999", // Coloque seu número (55 + DDD + Número)
+      arrobaVendedor: "@sualoja",
+      nomeDestaque: "SUA",
+      nomeResto: "LOJA"
+    };
+
+    const produtos = [
+      {
+        id: 1,
+        titulo: "Antiga | Rara",
+        categoria: "Rara",
+        imagem: "https://placehold.co/400x400/181824/8b5cf6?text=Item+01",
+        temVideo: true,
+        specs: [
+          "👕 | 483 PEITORAIS",
+          "🚀 | NÍVEL 73",
+          "🎫 | STEAM PUNK",
+          "👖 | CALÇAS ANGELICAIS"
+        ],
+        precoAntigo: 215.00,
+        precoAtual: 69.90
+      },
+      {
+        id: 2,
+        titulo: "Veterana | SemiFull",
+        categoria: "SemiFull",
+        imagem: "https://placehold.co/400x400/181824/8b5cf6?text=Item+02",
+        temVideo: true,
+        specs: [
+          "👕 | 957 PEITORAIS",
+          "🚀 | NÍVEL 78",
+          "🎫 | 3 PASSE, HIP HOP",
+          "🌸 | SAKURA"
+        ],
+        precoAntigo: 3150.00,
+        precoAtual: 97.90
+      },
+      {
+        id: 3,
+        titulo: "Veterana | Gemada",
+        categoria: "Gemada",
+        imagem: "https://placehold.co/400x400/181824/8b5cf6?text=Item+03",
+        temVideo: false,
+        specs: [
+          "👕 | 620 PEITORAIS",
+          "🚀 | NÍVEL 70",
+          "🔫 | ARMAS EVOLUTIVAS",
+          "💎 | BÔNUS INCLUSO"
+        ],
+        precoAntigo: 450.00,
+        precoAtual: 129.90
+      },
+      {
+        id: 4,
+        titulo: "Veterana | Gemada",
+        categoria: "Gemada",
+        imagem: "https://placehold.co/400x400/181824/8b5cf6?text=Item+04",
+        temVideo: false,
+        specs: [
+          "👕 | 810 PEITORAIS",
+          "🚀 | NÍVEL 75",
+          "🎭 | CONJUNTOS RAROS",
+          "⚡ | ENTREGA RÁPIDA"
+        ],
+        precoAntigo: 590.00,
+        precoAtual: 149.90
+      }
+    ];
+    // =========================================================
+
+    let favoritos = [];
+    let apenasFavoritos = false;
+
+    document.querySelector(".logo").innerHTML = `☰ <span>${CONFIG.nomeDestaque}</span>${CONFIG.nomeResto}`;
+
+    function formatarMoeda(valor) {
+      return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function calcularDesconto(antigo, atual) {
+      return Math.round(((antigo - atual) / antigo) * 100);
+    }
+
+    function toggleFav(id) {
+      if (favoritos.includes(id)) {
+        favoritos = favoritos.filter(item => item !== id);
+      } else {
+        favoritos.push(id);
+      }
+      document.getElementById("favCount").innerText = favoritos.length;
+      renderProducts();
+    }
+
+    function toggleOnlyFavs() {
+      apenasFavoritos = !apenasFavoritos;
+      renderProducts();
+    }
+
+    function toggleSpecs(id) {
+      const el = document.getElementById(`specs-${id}`);
+      const btn = document.getElementById(`btn-specs-${id}`);
+      el.classList.toggle("expanded");
+      btn.innerText = el.classList.contains("expanded") ? "Ver menos ▴" : "Ver mais ▾";
+    }
+
+    function comprar(titulo, preco) {
+      const msg = encodeURIComponent(`Olá! Tenho interesse no item *${titulo}* por *${formatarMoeda(preco)}* que vi no catálogo.`);
+      window.open(`https://wa.me/${CONFIG.whatsappNumero}?text=${msg}`, "_blank");
+    }
+
+    function renderProducts() {
+      const busca = document.getElementById("searchInput").value.toLowerCase();
+      const categoria = document.getElementById("categoryFilter").value;
+      const grid = document.getElementById("productGrid");
+
+      const filtrados = produtos.filter(p => {
+        const matchTexto = p.titulo.toLowerCase().includes(busca) || p.specs.join(" ").toLowerCase().includes(busca);
+        const matchCat = categoria === "todos" || p.categoria === categoria;
+        const matchFav = !apenasFavoritos || favoritos.includes(p.id);
+        return matchTexto && matchCat && matchFav;
+      });
+
+      grid.innerHTML = filtrados.map(p => {
+        const desconto = calcularDesconto(p.precoAntigo, p.precoAtual);
+        const isFav = favoritos.includes(p.id);
+        return `
+          <div class="card">
+            <div class="card-media">
+              <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(${p.id})">${isFav ? '♥' : '♡'}</button>
+              <img src="${p.imagem}" alt="${p.titulo}" />
+              ${p.temVideo ? '<div class="video-tag">▶ Vídeo</div>' : ''}
+            </div>
+            <div class="card-body">
+              <div class="card-title">${p.titulo}</div>
+              <ul class="specs" id="specs-${p.id}">
+                ${p.specs.map(s => `<li>${s}</li>`).join("")}
+              </ul>
+              <button class="ver-mais" id="btn-specs-${p.id}" onclick="toggleSpecs(${p.id})">Ver mais ▾</button>
+
+              <div class="price-row">
+                <span class="old-price">${formatarMoeda(p.precoAntigo)}</span>
+                <span class="discount">-${desconto}%</span>
+              </div>
+
+              <div class="final-row">
+                <span class="final-price">${formatarMoeda(p.precoAtual)}</span>
+                <span class="seller">${CONFIG.arrobaVendedor} <span class="verified">✓</span></span>
+              </div>
+
+              <button class="buy-btn" onclick="comprar('${p.titulo}', ${p.precoAtual})">
+                🛒 Comprar
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loja Oficial | Catálogo</title>
+  <style>
+    :root {
+      --bg-main: #09090b;
+      --bg-header: #0f0f14;
+      --bg-card: #13131a;
+      --bg-input: #1a1a24;
+      --border-color: #272736;
+      --purple-primary: #8b5cf6;
+      --purple-hover: #7c3aed;
+      --purple-glow: rgba(139, 92, 246, 0.25);
+      --text-main: #f4f4f5;
+      --text-muted: #9ca3af;
+      --discount-red: #f43f5e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      padding-bottom: 40px;
+    }
+
+    /* Topo */
+    header {
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo span {
+      color: var(--purple-primary);
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      color: var(--text-main);
+      font-size: 1.1rem;
+    }
+
+    .badge-fav {
+      position: relative;
+      cursor: pointer;
+    }
+
+    /* Barra de Busca e Filtro */
+    .controls {
+      padding: 12px 12px 6px;
+      display: flex;
+      gap: 8px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .search-box {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      padding: 10px 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .filter-select {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 0 10px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    /* Grade de Produtos (2 colunas no celular) */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 10px 12px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+    }
+
+    /* Card do Produto */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--purple-primary);
+    }
+
+    .card-media {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #1e1e28;
+      overflow: hidden;
+    }
+
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .fav-btn {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(9, 9, 11, 0.7);
+      border: none;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .fav-btn.active {
+      color: var(--purple-primary);
+    }
+
+    .video-tag {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(9, 9, 11, 0.78);
+      color: #fff;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-body {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .specs {
+      list-style: none;
+      font-size: 0.73rem;
+      color: #d4d4d8;
+      line-height: 1.45;
+      margin-bottom: 6px;
+      max-height: 64px;
+      overflow: hidden;
+    }
+
+    .specs.expanded {
+      max-height: none;
+    }
+
+    .ver-mais {
+      background: none;
+      border: none;
+      color: var(--purple-primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .old-price {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    .discount {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--discount-red);
+    }
+
+    .final-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 2px 0 10px;
+    }
+
+    .final-price {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--purple-primary);
+    }
+
+    .seller {
+      font-size: 0.72rem;
+      color: var(--purple-primary);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .verified {
+      background: var(--purple-primary);
+      color: #fff;
+      border-radius: 50%;
+      width: 13px;
+      height: 13px;
+      font-size: 0.55rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .buy-btn {
+      width: 100%;
+      background: var(--purple-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px var(--purple-glow);
+      transition: background 0.2s;
+    }
+
+    .buy-btn:hover {
+      background: var(--purple-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">☰ <span id="storeTitle">SUA</span>LOJA</div>
+    <div class="header-icons">
+      <span class="badge-fav" onclick="toggleOnlyFavs()" title="Favoritos">♡ <small id="favCount">0</small></span>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar..." oninput="renderProducts()" />
+    </div>
+    <select class="filter-select" id="categoryFilter" onchange="renderProducts()">
+      <option value="todos">Filtrar</option>
+      <option value="Rara">Rara</option>
+      <option value="SemiFull">SemiFull</option>
+      <option value="Gemada">Gemada</option>
+    </select>
+  </div>
+
+  <main class="grid" id="productGrid"></main>
+
+  <script>
+    // ================= CONFIGURAÇÕES DA LOJA =================
+    const CONFIG = {
+      whatsappNumero: "5591999999999", // Coloque seu número (55 + DDD + Número)
+      arrobaVendedor: "@sualoja",
+      nomeDestaque: "SUA",
+      nomeResto: "LOJA"
+    };
+
+    const produtos = [
+      {
+        id: 1,
+        titulo: "Antiga | Rara",
+        categoria: "Rara",
+        imagem: "https://placehold.co/400x400/181824/8b5cf6?text=Item+01",
+        temVideo: true,
+        specs: [
+          "👕 | 483 PEITORAIS",
+          "🚀 | NÍVEL 73",
+          "🎫 | STEAM PUNK",
+          "👖 | CALÇAS ANGELICAIS"
+        ],
+        precoAntigo: 215.00,
+        precoAtual: 69.90
+      },
+      {
+        id: 2,
+        titulo: "Veterana | SemiFull",
+        categoria: "SemiFull",
+        imagem: "https://placehold.co/400x400/181824/8b5cf6?text=Item+02",
+        temVideo: true,
+        specs: [
+          "👕 | 957 PEITORAIS",
+          "🚀 | NÍVEL 78",
+          "🎫 | 3 PASSE, HIP HOP",
+          "🌸 | SAKURA"
+        ],
+        precoAntigo: 3150.00,
+        precoAtual: 97.90
+      },
+      {
+        id: 3,
+        titulo: "Veterana | Gemada",
+        categoria: "Gemada",
+        imagem: "https://placehold.co/400x400/181824/8b5cf6?text=Item+03",
+        temVideo: false,
+        specs: [
+          "👕 | 620 PEITORAIS",
+          "🚀 | NÍVEL 70",
+          "🔫 | ARMAS EVOLUTIVAS",
+          "💎 | BÔNUS INCLUSO"
+        ],
+        precoAntigo: 450.00,
+        precoAtual: 129.90
+      },
+      {
+        id: 4,
+        titulo: "Veterana | Gemada",
+        categoria: "Gemada",
+        imagem: "https://placehold.co/400x400/181824/8b5cf6?text=Item+04",
+        temVideo: false,
+        specs: [
+          "👕 | 810 PEITORAIS",
+          "🚀 | NÍVEL 75",
+          "🎭 | CONJUNTOS RAROS",
+          "⚡ | ENTREGA RÁPIDA"
+        ],
+        precoAntigo: 590.00,
+        precoAtual: 149.90
+      }
+    ];
+    // =========================================================
+
+    let favoritos = [];
+    let apenasFavoritos = false;
+
+    document.querySelector(".logo").innerHTML = `☰ <span>${CONFIG.nomeDestaque}</span>${CONFIG.nomeResto}`;
+
+    function formatarMoeda(valor) {
+      return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function calcularDesconto(antigo, atual) {
+      return Math.round(((antigo - atual) / antigo) * 100);
+    }
+
+    function toggleFav(id) {
+      if (favoritos.includes(id)) {
+        favoritos = favoritos.filter(item => item !== id);
+      } else {
+        favoritos.push(id);
+      }
+      document.getElementById("favCount").innerText = favoritos.length;
+      renderProducts();
+    }
+
+    function toggleOnlyFavs() {
+      apenasFavoritos = !apenasFavoritos;
+      renderProducts();
+    }
+
+    function toggleSpecs(id) {
+      const el = document.getElementById(`specs-${id}`);
+      const btn = document.getElementById(`btn-specs-${id}`);
+      el.classList.toggle("expanded");
+      btn.innerText = el.classList.contains("expanded") ? "Ver menos ▴" : "Ver mais ▾";
+    }
+
+    function comprar(titulo, preco) {
+      const msg = encodeURIComponent(`Olá! Tenho interesse no item *${titulo}* por *${formatarMoeda(preco)}* que vi no catálogo.`);
+      window.open(`https://wa.me/${CONFIG.whatsappNumero}?text=${msg}`, "_blank");
+    }
+
+    function renderProducts() {
+      const busca = document.getElementById("searchInput").value.toLowerCase();
+      const categoria = document.getElementById("categoryFilter").value;
+      const grid = document.getElementById("productGrid");
+
+      const filtrados = produtos.filter(p => {
+        const matchTexto = p.titulo.toLowerCase().includes(busca) || p.specs.join(" ").toLowerCase().includes(busca);
+        const matchCat = categoria === "todos" || p.categoria === categoria;
+        const matchFav = !apenasFavoritos || favoritos.includes(p.id);
+        return matchTexto && matchCat && matchFav;
+      });
+
+      grid.innerHTML = filtrados.map(p => {
+        const desconto = calcularDesconto(p.precoAntigo, p.precoAtual);
+        const isFav = favoritos.includes(p.id);
+        return `
+          <div class="card">
+            <div class="card-media">
+              <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(${p.id})">${isFav ? '♥' : '♡'}</button>
+              <img src="${p.imagem}" alt="${p.titulo}" />
+              ${p.temVideo ? '<div class="video-tag">▶ Vídeo</div>' : ''}
+            </div>
+            <div class="card-body">
+              <div class="card-title">${p.titulo}</div>
+              <ul class="specs" id="specs-${p.id}">
+                ${p.specs.map(s => `<li>${s}</li>`).join("")}
+              </ul>
+              <button class="ver-mais" id="btn-specs-${p.id}" onclick="toggleSpecs(${p.id})">Ver mais ▾</button>
+
+              <div class="price-row">
+                <span class="old-price">${formatarMoeda(p.precoAntigo)}</span>
+                <span class="discount">-${desconto}%</span>
+              </div>
+
+              <div class="final-row">
+                <span class="final-price">${formatarMoeda(p.precoAtual)}</span>
+                <span class="seller">${CONFIG.arrobaVendedor} <span class="verified">✓</span></span>
+              </div>
+
+              <button class="buy-btn" onclick="comprar('${p.titulo}', ${p.precoAtual})">
+                🛒 Comprar
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
